@@ -1,5 +1,5 @@
 import React from 'react';
-import { Settings as SettingsIcon, Moon, Sun, Hand, Music } from 'lucide-react';
+import { Settings as SettingsIcon, Moon, Sun, Hand, Music, Hash } from 'lucide-react';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { TUNING_NAMES } from '@/types';
 
@@ -8,9 +8,11 @@ const Settings: React.FC = () => {
     leftHanded,
     theme,
     tuning,
+    noteDisplay,
     setLeftHanded,
     setTheme,
     setTuning,
+    setNoteDisplay,
   } = useSettingsStore();
   
   const tunings = Object.keys(TUNING_NAMES);
@@ -141,6 +143,50 @@ const Settings: React.FC = () => {
                       )}
                     </button>
                   ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-cream-50 dark:bg-wood-800 rounded-2xl p-6 shadow-soft border border-wood-100 dark:border-wood-700">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-wine-100 dark:bg-wine-900/30 flex items-center justify-center text-wine-700 dark:text-wine-300 flex-shrink-0">
+                <Hash size={24} />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-display font-bold text-xl text-wood-900 dark:text-cream-50 mb-1">
+                  音符显示方式
+                </h3>
+                <p className="text-wood-500 dark:text-wood-400 text-sm mb-4">
+                  选择升号 (#) 或降号 (b) 显示和弦名称
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setNoteDisplay('sharp')}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all
+                      ${noteDisplay === 'sharp'
+                        ? 'bg-wine-700 text-white shadow-soft'
+                        : 'bg-wood-100 dark:bg-wood-700 text-wood-600 dark:text-wood-400 hover:bg-wood-200 dark:hover:bg-wood-600'
+                      }
+                    `}
+                  >
+                    <span>升号</span>
+                    <span className="text-sm">(C#)</span>
+                  </button>
+                  <button
+                    onClick={() => setNoteDisplay('flat')}
+                    className={`
+                      flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-medium transition-all
+                      ${noteDisplay === 'flat'
+                        ? 'bg-wine-700 text-white shadow-soft'
+                        : 'bg-wood-100 dark:bg-wood-700 text-wood-600 dark:text-wood-400 hover:bg-wood-200 dark:hover:bg-wood-600'
+                      }
+                    `}
+                  >
+                    <span>降号</span>
+                    <span className="text-sm">(Db)</span>
+                  </button>
                 </div>
               </div>
             </div>

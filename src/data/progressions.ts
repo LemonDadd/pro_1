@@ -63,10 +63,20 @@ export const PRESET_PROGRESSIONS: Progression[] = [
   },
 ];
 
-export const getProgressionById = (id: string): Progression | undefined => {
+export const getPresetProgressionById = (id: string): Progression | undefined => {
   return PRESET_PROGRESSIONS.find(p => p.id === id);
 };
 
-export const getAllProgressions = (): Progression[] => {
+export const getAllPresetProgressions = (): Progression[] => {
   return [...PRESET_PROGRESSIONS];
+};
+
+export const getProgressionById = (id: string, customProgressions: Progression[] = [] ): Progression | undefined => {
+  const preset = PRESET_PROGRESSIONS.find(p => p.id === id);
+  if (preset) return preset;
+  return customProgressions.find(p => p.id === id);
+};
+
+export const getAllProgressions = (customProgressions: Progression[] = []): Progression[] => {
+  return [...customProgressions, ...PRESET_PROGRESSIONS];
 };

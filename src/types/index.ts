@@ -33,6 +33,7 @@ export interface UserSettings {
   volume: number;
   bpm: number;
   playMode: 'strum' | 'arpeggio';
+  noteDisplay: 'sharp' | 'flat';
 }
 
 export interface FavoriteItem {
@@ -52,6 +53,21 @@ export type ChordQuality = 'maj' | 'min' | '7' | 'm7' | 'maj7' | 'sus2' | 'sus4'
 export const CHORD_QUALITIES: ChordQuality[] = ['maj', 'min', '7', 'm7', 'maj7', 'sus2', 'sus4', 'dim', 'aug'];
 
 export const ROOT_NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+export const FLAT_NOTES = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+export const ENHARMONIC_MAP: Record<string, string> = {
+  'C#': 'Db',
+  'Db': 'C#',
+  'D#': 'Eb',
+  'Eb': 'D#',
+  'F#': 'Gb',
+  'Gb': 'F#',
+  'G#': 'Ab',
+  'Ab': 'G#',
+  'A#': 'Bb',
+  'Bb': 'A#',
+};
 
 export const TUNINGS: Record<string, number[]> = {
   standard: [64, 59, 55, 50, 45, 40],

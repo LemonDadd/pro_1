@@ -1,4 +1,4 @@
-import { Chord, ChordPosition, ROOT_NOTES, QUALITY_DISPLAY, ChordQuality } from '@/types';
+import { Chord, ChordPosition, ROOT_NOTES, FLAT_NOTES, ENHARMONIC_MAP, QUALITY_DISPLAY, ChordQuality } from '@/types';
 
 const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -10,6 +10,35 @@ export function transposeNote(note: string, semitones: number): string {
   const idx = getNoteIndex(note);
   const newIdx = ((idx + semitones) % 12 + 12) % 12;
   return NOTE_NAMES[newIdx];
+}
+
+export function getDisplayNote(note: string, noteDisplay: 'sharp' | 'flat' = 'sharp'): string {
+  if (noteDisplay === 'flat' && ENHARMONIC_MAP[note]) {
+    return ENHARMONIC_MAP[note];
+  }
+  if (noteDisplay === 'sharp' && ENHARMONIC_MAP[note] && note.includes('b')) {
+    return ENHARMONIC_MAP[note];
+  }
+  return note;
+}
+
+export function getDisplayChordSymbol(symbol: string, noteDisplay: 'sharp' | 'flat' = 'sharp'): string {
+  let root = '';
+  let rest = '';
+  
+  if (symbol.length >= 2 && (symbol[1] === '#' || symbol[1] === 'b')) {
+    root = symbol.substring(0, 2);
+    rest = symbol.substring(2);
+  } else {
+    root = symbol.substring(0, 1);
+    rest = symbol.substring(1);
+  }
+  
+  return getDisplayNote(root, noteDisplay) + rest;
+}
+
+export function getDisplayRootNotes(noteDisplay: 'sharp' | 'flat' = 'sharp'): string[] {
+  return noteDisplay === 'flat' ? FLAT_NOTES : ROOT_NOTES;
 }
 
 function getOrdinal(n: number): string {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Heart, ArrowLeft, Music } from 'lucide-react';
 import Fretboard from '@/components/Fretboard';
 import AudioControls from '@/components/AudioControls';
@@ -9,16 +9,19 @@ import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { QUALITY_NAMES, ROOT_NOTES, CHORD_QUALITIES, QUALITY_DISPLAY } from '@/types';
+import { getDisplayChordSymbol, getDisplayNote, getDisplayRootNotes } from '@/utils/chordUtils';
 
 const ChordDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [positionIndex, setPositionIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   
   const { isFavorite, toggleFavorite } = useFavoritesStore();
   const { addToHistory } = useHistoryStore();
-  const { tuning, volume, bpm, playMode } = useSettingsStore();
+  const { tuning, volume, bpm, playMode, noteDisplay } = useSettingsStore();
+  const displayRootNotes = getDisplayRootNotes(noteDisplay);
   
   const chord = symbol ? getChordBySymbol(decodeURIComponent(symbol)) : null;
   const position = chord?.positions[positionIndex];
@@ -30,8 +33,16 @@ const ChordDetail: React.FC = () => {
   }, [chord?.id, addToHistory]);
   
   useEffect(() => {
+    const posParam = searchParams.get('position');
+    if (posParam) {
+      const idx = parseInt(posParam, 10);
+      if (!isNaN(idx) && chord && idx >= 0 && idx < chord.positions.length) {
+        setPositionIndex(idx);
+        return;
+      }
+    }
     setPositionIndex(0);
-  }, [symbol]);
+  }, [symbol, chord, searchParams]);
   
   const handlePlay = () => {
     if (!position) return;
@@ -49,17 +60,31 @@ const ChordDetail: React.FC = () => {
   
   const handlePrevPosition = () => {
     if (!chord) return;
-    setPositionIndex((prev) => (prev - 1 + chord.positions.length) % chord.positions.length);
+    const newIndex = (positionIndex - 1 + chord.positions.length) % chord.positions.length;
+    setPositionIndex(newIndex);
+    setSearchParams({ position: newIndex.toString() });
   };
   
   const handleNextPosition = () => {
     if (!chord) return;
-    setPositionIndex((prev) => (prev + 1) % chord.positions.length);
+    const newIndex = (positionIndex + 1) % chord.positions.length;
+    setPositionIndex(newIndex);
+    setSearchParams({ position: newIndex.toString() });
   };
   
-  const handleRootChange = (newRoot: string) => {
+  const handleRootChange = (displayRoot: string) => {
     if (!chord) return;
-    const newSymbol = newRoot + QUALITY_DISPLAY[chord.quality];
+    let internalRoot = displayRoot;
+    if (noteDisplay === 'flat') {
+      internalRoot = displayRoot.includes('b') ? (
+        displayRoot === 'Db' ? 'C#' :
+        displayRoot === 'Eb' ? 'D#' :
+        displayRoot === 'Gb' ? 'F#' :
+        displayRoot === 'Ab' ? 'G#' :
+        displayRoot === 'Bb' ? 'A#' : displayRoot
+      ) : displayRoot;
+    }
+    const newSymbol = internalRoot + QUALITY_DISPLAY[chord.quality];
     navigate(`/chord/${encodeURIComponent(newSymbol)}`);
   };
   
@@ -110,7 +135,7 @@ const ChordDetail: React.FC = () => {
               <div className="flex items-start justify-between mb-8">
                 <div>
                   <h1 className="font-display text-5xl font-bold text-wood-900 dark:text-cream-50 mb-2">
-                    {chord.symbol}
+                    {getDisplayChordSymbol(chord.symbol, noteDisplay)}
                   </h1>
                   <p className="text-wood-500 dark:text-wood-400 text-lg">
                     {QUALITY_NAMES[chord.quality] || chord.quality}
@@ -168,7 +193,10 @@ const ChordDetail: React.FC = () => {
                 {chord.positions.map((pos, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setPositionIndex(idx)}
+                    onClick={() => {
+                      setPositionIndex(idx);
+                      setSearchParams({ position: idx.toString() });
+                    }}
                     className={`
                       px-4 py-2 rounded-full text-sm font-medium transition-all
                       ${idx === positionIndex
@@ -189,21 +217,24 @@ const ChordDetail: React.FC = () => {
                   选择根音
                 </h3>
                 <div className="grid grid-cols-6 gap-2">
-                  {ROOT_NOTES.map((root) => (
-                    <button
-                      key={root}
-                      onClick={() => handleRootChange(root)}
-                      className={`
-                        py-2 rounded-lg text-sm font-medium transition-all
-                        ${root === chord.root
-                          ? 'bg-wine-700 text-white'
-                          : 'bg-wood-100 dark:bg-wood-700 text-wood-700 dark:text-wood-300 hover:bg-wood-200 dark:hover:bg-wood-600'
-                        }
-                      `}
-                    >
-                      {root}
-                    </button>
-                  ))}
+                  {displayRootNotes.map((root) => {
+                    const isSelected = getDisplayNote(chord.root, noteDisplay) === root;
+                    return (
+                      <button
+                        key={root}
+                        onClick={() => handleRootChange(root)}
+                        className={`
+                          py-2 rounded-lg text-sm font-medium transition-all
+                          ${isSelected
+                            ? 'bg-wine-700 text-white'
+                            : 'bg-wood-100 dark:bg-wood-700 text-wood-700 dark:text-wood-300 hover:bg-wood-200 dark:hover:bg-wood-600'
+                          }
+                        `}
+                      >
+                        {root}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               

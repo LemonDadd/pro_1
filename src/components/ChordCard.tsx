@@ -7,6 +7,7 @@ import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { playChord } from '@/utils/audio';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { QUALITY_NAMES } from '@/types';
+import { getDisplayChordSymbol } from '@/utils/chordUtils';
 
 interface ChordCardProps {
   chord: Chord;
@@ -22,8 +23,9 @@ const ChordCard: React.FC<ChordCardProps> = ({
   size = 'medium',
 }) => {
   const { isFavorite, toggleFavorite } = useFavoritesStore();
-  const { volume, tuning, bpm, playMode } = useSettingsStore();
+  const { volume, tuning, bpm, playMode, noteDisplay } = useSettingsStore();
   const position = chord.positions[positionIndex] || chord.positions[0];
+  const displaySymbol = getDisplayChordSymbol(chord.symbol, noteDisplay);
   
   const isFav = isFavorite(chord.id, 'chord');
   
@@ -54,7 +56,7 @@ const ChordCard: React.FC<ChordCardProps> = ({
           <h3 className={`font-display font-bold text-wood-900 dark:text-cream-50 ${
             size === 'small' ? 'text-lg' : 'text-2xl'
           }`}>
-            {chord.symbol}
+            {displaySymbol}
           </h3>
           <p className="text-xs text-wood-500 dark:text-wood-400 mt-0.5">
             {QUALITY_NAMES[chord.quality] || chord.quality}

@@ -9,6 +9,7 @@ interface SettingsState extends UserSettings {
   setVolume: (volume: number) => void;
   setBpm: (bpm: number) => void;
   setPlayMode: (mode: 'strum' | 'arpeggio') => void;
+  setNoteDisplay: (mode: 'sharp' | 'flat') => void;
   toggleTheme: () => void;
 }
 
@@ -21,6 +22,7 @@ export const useSettingsStore = create<SettingsState>()(
       volume: 0.4,
       bpm: 90,
       playMode: 'strum',
+      noteDisplay: 'sharp',
       
       setLeftHanded: (value) => set({ leftHanded: value }),
       setTheme: (theme) => set({ theme }),
@@ -28,6 +30,7 @@ export const useSettingsStore = create<SettingsState>()(
       setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
       setBpm: (bpm) => set({ bpm: Math.max(40, Math.min(240, bpm)) }),
       setPlayMode: (mode) => set({ playMode: mode }),
+      setNoteDisplay: (mode) => set({ noteDisplay: mode }),
       toggleTheme: () => set({ theme: get().theme === 'light' ? 'dark' : 'light' }),
     }),
     {

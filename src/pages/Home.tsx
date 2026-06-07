@@ -1,15 +1,18 @@
-import React from 'react';
-import { Music, ArrowRight } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Music, ArrowRight, Filter, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SearchBar from '@/components/SearchBar';
 import ChordCard from '@/components/ChordCard';
-import { getPopularChords } from '@/utils/chordUtils';
+import { getPopularChords, generateChord, getDisplayRootNotes, getDisplayChordSymbol } from '@/utils/chordUtils';
 import { useHistoryStore } from '@/store/useHistoryStore';
+import { useSettingsStore } from '@/store/useSettingsStore';
 import { getChordBySymbol } from '@/utils/chordUtils';
+import { CHORD_QUALITIES, QUALITY_DISPLAY, QUALITY_NAMES } from '@/types';
 
 const Home: React.FC = () => {
   const popularChords = getPopularChords();
   const { getRecentChords } = useHistoryStore();
+  const { noteDisplay } = useSettingsStore();
   const recentChordIds = getRecentChords();
   const recentChords = recentChordIds
     .slice(0, 6)
@@ -17,6 +20,53 @@ const Home: React.FC = () => {
     .filter(c => c !== null);
   
   const quickChords = ['C', 'G', 'Am', 'F', 'Dm', 'Em', 'D', 'A'];
+  
+  const [selectedRoot, setSelectedRoot] = useState<string | null>(null);
+  const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
+  const displayRootNotes = getDisplayRootNotes(noteDisplay);
+  
+  const filteredChords = useMemo(() => {
+    if (!selectedRoot && !selectedQuality) {
+      return popularChords.slice(0, 10);
+    }
+    
+    const chords = [];
+    const roots = selectedRoot ? [selectedRoot] : displayRootNotes;
+    const qualities = selectedQuality ? [selectedQuality] : CHORD_QUALITIES;
+    
+    for (const displayRoot of roots) {
+      let internalRoot = displayRoot;
+      if (noteDisplay === 'flat' && displayRoot.includes('b')) {
+        internalRoot = displayRoot === 'Db' ? 'C#' :
+          displayRoot === 'Eb' ? 'D#' :
+          displayRoot === 'Gb' ? 'F#' :
+          displayRoot === 'Ab' ? 'G#' :
+          displayRoot === 'Bb' ? 'A#' : displayRoot;
+      }
+      
+      for (const quality of qualities) {
+        const chord = generateChord(internalRoot, quality);
+        if (chord) {
+          chords.push(chord);
+        }
+      }
+    }
+    
+    return chords;
+  }, [selectedRoot, selectedQuality, noteDisplay, displayRootNotes, popularChords]);
+  
+  const handleRootFilter = (root: string) => {
+    setSelectedRoot(selectedRoot === root ? null : root);
+  };
+  
+  const handleQualityFilter = (quality: string) => {
+    setSelectedQuality(selectedQuality === quality ? null : quality);
+  };
+  
+  const clearFilters = () => {
+    setSelectedRoot(null);
+    setSelectedQuality(null);
+  };
   
   return (
     <div className="min-h-screen bg-wood-50 dark:bg-wood-900">
@@ -89,25 +139,89 @@ const Home: React.FC = () => {
         
         <section className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="font-display text-2xl font-bold text-wood-900 dark:text-cream-50">
-              热门和弦
-            </h2>
-            <Link
-              to="/chord/C"
-              className="flex items-center gap-1 text-wine-700 dark:text-wine-500 font-medium hover:gap-2 transition-all"
-            >
-              查看全部
-              <ArrowRight size={18} />
-            </Link>
+            <div className="flex items-center gap-3">
+              <Filter size={24} className="text-wine-600 dark:text-wine-400" />
+              <h2 className="font-display text-2xl font-bold text-wood-900 dark:text-cream-50">
+                和弦浏览器
+              </h2>
+            </div>
+            {(selectedRoot || selectedQuality) && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1 text-wine-700 dark:text-wine-500 font-medium hover:gap-2 transition-all text-sm"
+              >
+                清除筛选
+                <X size={16} />
+              </button>
+            )}
+          </div>
+          
+          <div className="bg-cream-50 dark:bg-wood-800 rounded-2xl p-6 mb-8 border border-wood-100 dark:border-wood-700 shadow-soft">
+            <div className="mb-4">
+              <span className="text-sm font-medium text-wood-600 dark:text-wood-400 mb-2 block">
+                根音
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {displayRootNotes.map((root) => (
+                  <button
+                    key={root}
+                    onClick={() => handleRootFilter(root)}
+                    className={`
+                      w-10 h-10 rounded-lg font-bold text-sm transition-all
+                      ${selectedRoot === root
+                        ? 'bg-wine-700 text-white shadow-soft scale-105'
+                        : 'bg-wood-100 dark:bg-wood-700 text-wood-700 dark:text-wood-300 hover:bg-wood-200 dark:hover:bg-wood-600'
+                      }
+                    `}
+                  >
+                    {root}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <span className="text-sm font-medium text-wood-600 dark:text-wood-400 mb-2 block">
+                和弦类型
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {CHORD_QUALITIES.map((quality) => (
+                  <button
+                    key={quality}
+                    onClick={() => handleQualityFilter(quality)}
+                    className={`
+                      px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+                      ${selectedQuality === quality
+                        ? 'bg-wine-700 text-white shadow-soft scale-105'
+                        : 'bg-wood-100 dark:bg-wood-700 text-wood-700 dark:text-wood-300 hover:bg-wood-200 dark:hover:bg-wood-600'
+                      }
+                    `}
+                  >
+                    {QUALITY_DISPLAY[quality] || quality}
+                    <span className="ml-1 text-xs opacity-70">
+                      {QUALITY_NAMES[quality]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {popularChords.slice(0, 10).map((chord, idx) => (
-              <div key={chord.id} style={{ animationDelay: `${idx * 0.05}s` }} className="animate-fade-up">
+            {filteredChords.map((chord, idx) => (
+              <div key={chord.id} style={{ animationDelay: `${idx * 0.03}s` }} className="animate-fade-up">
                 <ChordCard chord={chord} />
               </div>
             ))}
           </div>
+          
+          {filteredChords.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-wood-500 dark:text-wood-400">
+                未找到匹配的和弦
+              </p>
+            </div>
+          )}
         </section>
         
         <section className="mt-16 animate-fade-up" style={{ animationDelay: '0.3s' }}>

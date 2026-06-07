@@ -6,18 +6,21 @@ import { getProgressionById } from '@/data/progressions';
 import { getChordBySymbol } from '@/utils/chordUtils';
 import { playChord, playMetronomeClick, getAudioContext } from '@/utils/audio';
 import { useSettingsStore } from '@/store/useSettingsStore';
+import { useCustomProgressionsStore } from '@/store/useCustomProgressionsStore';
+import { getDisplayChordSymbol } from '@/utils/chordUtils';
 
 const Practice: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const progression = id ? getProgressionById(id) : undefined;
+  const { customProgressions } = useCustomProgressionsStore();
+  const progression = id ? getProgressionById(id, customProgressions) : undefined;
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentChordIndex, setCurrentChordIndex] = useState(0);
   const [currentBeat, setCurrentBeat] = useState(0);
   const [beatsPerChord] = useState(4);
   
-  const { tuning, volume, bpm, playMode } = useSettingsStore();
+  const { tuning, volume, bpm, playMode, noteDisplay } = useSettingsStore();
   
   const intervalRef = useRef<number | null>(null);
   const beat = useRef(0);
@@ -164,7 +167,7 @@ const Practice: React.FC = () => {
                   }
                 `}
               >
-                {chord}
+                {getDisplayChordSymbol(chord, noteDisplay)}
               </div>
             ))}
           </div>
@@ -183,7 +186,7 @@ const Practice: React.FC = () => {
               
               <div className="text-center mb-6">
                 <h2 className="font-display text-5xl font-bold text-wood-900 dark:text-cream-50 mb-2">
-                  {currentChord?.symbol}
+                  {currentChord ? getDisplayChordSymbol(currentChord.symbol, noteDisplay) : ''}
                 </h2>
               </div>
               
@@ -253,7 +256,7 @@ const Practice: React.FC = () => {
                 )}
               </div>
               <p className="text-center text-wood-600 dark:text-wood-400 font-bold text-xl mt-3">
-                {nextChord?.symbol}
+                {nextChord ? getDisplayChordSymbol(nextChord.symbol, noteDisplay) : ''}
               </p>
             </div>
             

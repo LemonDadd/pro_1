@@ -3,15 +3,17 @@ import { Link } from 'react-router-dom';
 import { Heart, Music, List } from 'lucide-react';
 import ChordCard from '@/components/ChordCard';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
-import { getChordBySymbol } from '@/utils/chordUtils';
+import { getChordBySymbol, getDisplayChordSymbol } from '@/utils/chordUtils';
 import { getProgressionById } from '@/data/progressions';
 import { Play, ChevronRight } from 'lucide-react';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 type TabType = 'chords' | 'progressions';
 
 const Favorites: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('chords');
   const { getFavoritesByType } = useFavoritesStore();
+  const { noteDisplay } = useSettingsStore();
   
   const favoriteChords = getFavoritesByType('chord');
   const favoriteProgressions = getFavoritesByType('progression');
@@ -156,7 +158,7 @@ const Favorites: React.FC = () => {
                                 text-wood-700 dark:text-wood-200 font-bold text-lg
                               "
                             >
-                              {chord}
+                              {getDisplayChordSymbol(chord, noteDisplay)}
                             </div>
                           ))}
                         </div>

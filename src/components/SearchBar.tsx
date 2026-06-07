@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
-import { searchChords } from '@/utils/chordUtils';
+import { searchChords, getDisplayChordSymbol } from '@/utils/chordUtils';
 import { Chord } from '@/types';
 import Fretboard from './Fretboard';
+import { useSettingsStore } from '@/store/useSettingsStore';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -19,6 +20,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { noteDisplay } = useSettingsStore();
   
   useEffect(() => {
     if (query.trim()) {
@@ -50,8 +52,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
   
-  const handleChordClick = (symbol: string) => {
-    navigate(`/chord/${encodeURIComponent(symbol)}`);
+  const handleChordClick = (symbol: string, positionIndex = 0) => {
+    navigate(`/chord/${encodeURIComponent(symbol)}?position=${positionIndex}`);
     setIsOpen(false);
     setQuery('');
   };
@@ -104,29 +106,52 @@ const SearchBar: React.FC<SearchBarProps> = ({
           rounded-2xl shadow-warm border border-wood-100 dark:border-wood-700
           overflow-hidden z-50 animate-fade-in
         ">
-          <div className="p-2 max-h-96 overflow-y-auto">
+          <div className="p-2 max-h-[500px] overflow-y-auto">
             {results.map((chord) => (
-              <button
+              <div
                 key={chord.id}
-                onClick={() => handleChordClick(chord.symbol)}
                 className="
-                  w-full flex items-center gap-4 p-3 rounded-xl
+                  p-3 rounded-xl mb-1 last:mb-0
                   hover:bg-wood-100 dark:hover:bg-wood-700
-                  transition-colors text-left
+                  transition-colors
                 "
               >
-                <div className="flex-shrink-0 scale-75 origin-left">
-                  <Fretboard position={chord.positions[0]} size="small" showFingers={false} />
-                </div>
-                <div>
-                  <div className="font-display font-bold text-lg text-wood-900 dark:text-cream-50">
-                    {chord.symbol}
+                <div 
+                  className="flex items-center gap-4 cursor-pointer"
+                  onClick={() => handleChordClick(chord.symbol, 0)}
+                >
+                  <div className="flex-shrink-0 scale-75 origin-left">
+                    <Fretboard position={chord.positions[0]} size="small" showFingers={false} />
                   </div>
-                  <div className="text-sm text-wood-500 dark:text-wood-400">
-                    {chord.positions.length} 个把位
+                  <div className="flex-1">
+                    <div className="font-display font-bold text-lg text-wood-900 dark:text-cream-50">
+                      {getDisplayChordSymbol(chord.symbol, noteDisplay)}
+                    </div>
+                    <div className="text-sm text-wood-500 dark:text-wood-400">
+                      {chord.positions.length} 个把位
+                    </div>
                   </div>
                 </div>
-              </button>
+                
+                <div className="flex flex-wrap gap-1.5 mt-3 ml-2">
+                  {chord.positions.map((pos, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleChordClick(chord.symbol, idx);
+                      }}
+                      className="
+                        px-2.5 py-1 rounded-lg text-xs font-medium transition-all
+                        bg-wood-100 dark:bg-wood-700 text-wood-600 dark:text-wood-300
+                        hover:bg-wine-100 hover:text-wine-700 dark:hover:bg-wine-900/30 dark:hover:text-wine-300
+                      "
+                    >
+                      {pos.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>
