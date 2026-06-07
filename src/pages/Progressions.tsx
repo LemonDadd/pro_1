@@ -4,7 +4,8 @@ import { Play, ChevronRight, Music, Heart, Plus, Edit2, Trash2, X } from 'lucide
 import { getAllProgressions } from '@/data/progressions';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useCustomProgressionsStore } from '@/store/useCustomProgressionsStore';
-import { getChordBySymbol, getDisplayChordSymbol, getDisplayRootNotes } from '@/utils/chordUtils';
+import { getChordBySymbol } from '@/utils/chordRepository';
+import { getDisplayChordSymbol, getDisplayRootNotes } from '@/utils/chordDisplay';
 import { ROOT_NOTES, CHORD_QUALITIES, QUALITY_DISPLAY } from '@/types';
 import { useSettingsStore } from '@/store/useSettingsStore';
 

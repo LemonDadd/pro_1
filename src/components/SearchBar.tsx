@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, X } from 'lucide-react';
-import { searchChords, getDisplayChordSymbol } from '@/utils/chordUtils';
+import { searchChords } from '@/utils/chordRepository';
+import { getDisplayChordSymbol } from '@/utils/chordDisplay';
 import { Chord } from '@/types';
 import Fretboard from './Fretboard';
 import { useSettingsStore } from '@/store/useSettingsStore';

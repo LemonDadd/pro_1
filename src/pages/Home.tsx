@@ -3,10 +3,11 @@ import { Music, ArrowRight, Filter, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import SearchBar from '@/components/SearchBar';
 import ChordCard from '@/components/ChordCard';
-import { getPopularChords, generateChord, getDisplayRootNotes, getDisplayChordSymbol } from '@/utils/chordUtils';
+import { getPopularChords, getChordBySymbol } from '@/utils/chordRepository';
+import { generateChord } from '@/utils/chordGenerator';
+import { getDisplayRootNotes, getDisplayChordSymbol } from '@/utils/chordDisplay';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
-import { getChordBySymbol } from '@/utils/chordUtils';
 import { CHORD_QUALITIES, QUALITY_DISPLAY, QUALITY_NAMES } from '@/types';
 
 const Home: React.FC = () => {

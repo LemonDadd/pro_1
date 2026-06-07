@@ -7,7 +7,7 @@ import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { playChord } from '@/utils/audio';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { QUALITY_NAMES } from '@/types';
-import { getDisplayChordSymbol } from '@/utils/chordUtils';
+import { getDisplayChordSymbol } from '@/utils/chordDisplay';
 
 interface ChordCardProps {
   chord: Chord;

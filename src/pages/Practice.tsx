@@ -3,11 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Play, Pause, SkipBack, SkipForward, ArrowLeft, Music } from 'lucide-react';
 import Fretboard from '@/components/Fretboard';
 import { getProgressionById } from '@/data/progressions';
-import { getChordBySymbol } from '@/utils/chordUtils';
+import { getChordBySymbol } from '@/utils/chordRepository';
 import { playChord, playMetronomeClick, getAudioContext } from '@/utils/audio';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useCustomProgressionsStore } from '@/store/useCustomProgressionsStore';
-import { getDisplayChordSymbol } from '@/utils/chordUtils';
+import { getDisplayChordSymbol } from '@/utils/chordDisplay';
 
 const Practice: React.FC = () => {
   const { id } = useParams<{ id: string }>();

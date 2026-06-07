@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { HelpCircle, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
 import Fretboard from '@/components/Fretboard';
-import { getChordBySymbol } from '@/utils/chordUtils';
+import { getChordBySymbol } from '@/utils/chordRepository';
 
 interface FAQItem {
   question: string;

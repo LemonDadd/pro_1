@@ -3,13 +3,13 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Heart, ArrowLeft, Music } from 'lucide-react';
 import Fretboard from '@/components/Fretboard';
 import AudioControls from '@/components/AudioControls';
-import { getChordBySymbol } from '@/utils/chordUtils';
+import { getChordBySymbol } from '@/utils/chordRepository';
 import { playChord, getAudioContext } from '@/utils/audio';
 import { useFavoritesStore } from '@/store/useFavoritesStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { QUALITY_NAMES, ROOT_NOTES, CHORD_QUALITIES, QUALITY_DISPLAY } from '@/types';
-import { getDisplayChordSymbol, getDisplayNote, getDisplayRootNotes } from '@/utils/chordUtils';
+import { getDisplayChordSymbol, getDisplayNote, getDisplayRootNotes } from '@/utils/chordDisplay';
 
 const ChordDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();
