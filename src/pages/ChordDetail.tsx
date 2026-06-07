@@ -10,6 +10,7 @@ import { useSettingsStore } from '@/store/useSettingsStore';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { QUALITY_NAMES, ROOT_NOTES, CHORD_QUALITIES, QUALITY_DISPLAY } from '@/types';
 import { getDisplayChordSymbol, getDisplayNote, getDisplayRootNotes } from '@/utils/chordDisplay';
+import { toInternalRoot } from '@/utils/chordParser';
 
 const ChordDetail: React.FC = () => {
   const { symbol } = useParams<{ symbol: string }>();

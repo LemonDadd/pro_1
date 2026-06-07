@@ -6,6 +6,7 @@ import ChordCard from '@/components/ChordCard';
 import { getPopularChords, getChordBySymbol } from '@/utils/chordRepository';
 import { generateChord } from '@/utils/chordGenerator';
 import { getDisplayRootNotes, getDisplayChordSymbol } from '@/utils/chordDisplay';
+import { toInternalRoot } from '@/utils/chordParser';
 import { useHistoryStore } from '@/store/useHistoryStore';
 import { useSettingsStore } from '@/store/useSettingsStore';
 import { CHORD_QUALITIES, QUALITY_DISPLAY, QUALITY_NAMES } from '@/types';
@@ -36,14 +37,7 @@ const Home: React.FC = () => {
     const qualities = selectedQuality ? [selectedQuality] : CHORD_QUALITIES;
     
     for (const displayRoot of roots) {
-      let internalRoot = displayRoot;
-      if (noteDisplay === 'flat' && displayRoot.includes('b')) {
-        internalRoot = displayRoot === 'Db' ? 'C#' :
-          displayRoot === 'Eb' ? 'D#' :
-          displayRoot === 'Gb' ? 'F#' :
-          displayRoot === 'Ab' ? 'G#' :
-          displayRoot === 'Bb' ? 'A#' : displayRoot;
-      }
+      const internalRoot = toInternalRoot(displayRoot, noteDisplay);
       
       for (const quality of qualities) {
         const chord = generateChord(internalRoot, quality);

@@ -29,6 +29,16 @@ export function normalizeRoot(root: string): string {
   return flatToSharp(normalized);
 }
 
+export type NoteDisplayMode = 'sharp' | 'flat';
+
+export function toInternalRoot(displayRoot: string, noteDisplay: NoteDisplayMode = 'sharp'): string {
+  const normalized = displayRoot.charAt(0).toUpperCase() + displayRoot.slice(1);
+  if (noteDisplay === 'flat' && normalized.includes('b')) {
+    return flatToSharp(normalized);
+  }
+  return normalized;
+}
+
 export const QUALITY_MAP: Record<string, ChordQuality> = {
   '': 'maj',
   'maj': 'maj',
