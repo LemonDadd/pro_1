@@ -33,6 +33,19 @@ const ChordDetail: React.FC = () => {
   }, [chord?.id, addToHistory]);
   
   useEffect(() => {
+    if (!chord || !symbol) return;
+    
+    const decodedSymbol = decodeURIComponent(symbol);
+    const displaySymbol = getDisplayChordSymbol(chord.symbol, noteDisplay);
+    
+    if (decodedSymbol !== displaySymbol) {
+      const positionStr = searchParams.toString();
+      const queryStr = positionStr ? `?${positionStr}` : '';
+      navigate(`/chord/${encodeURIComponent(displaySymbol)}${queryStr}`, { replace: true });
+    }
+  }, [chord, symbol, noteDisplay, navigate, searchParams]);
+  
+  useEffect(() => {
     const posParam = searchParams.get('position');
     if (posParam) {
       const idx = parseInt(posParam, 10);
@@ -84,14 +97,16 @@ const ChordDetail: React.FC = () => {
         displayRoot === 'Bb' ? 'A#' : displayRoot
       ) : displayRoot;
     }
-    const newSymbol = internalRoot + QUALITY_DISPLAY[chord.quality];
-    navigate(`/chord/${encodeURIComponent(newSymbol)}`);
+    const internalSymbol = internalRoot + QUALITY_DISPLAY[chord.quality];
+    const displaySymbol = getDisplayChordSymbol(internalSymbol, noteDisplay);
+    navigate(`/chord/${encodeURIComponent(displaySymbol)}`);
   };
   
   const handleQualityChange = (newQuality: string) => {
     if (!chord) return;
-    const newSymbol = chord.root + QUALITY_DISPLAY[newQuality];
-    navigate(`/chord/${encodeURIComponent(newSymbol)}`);
+    const internalSymbol = chord.root + QUALITY_DISPLAY[newQuality];
+    const displaySymbol = getDisplayChordSymbol(internalSymbol, noteDisplay);
+    navigate(`/chord/${encodeURIComponent(displaySymbol)}`);
   };
   
   if (!chord || !position) {

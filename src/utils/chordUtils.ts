@@ -542,6 +542,13 @@ export function searchChords(query: string): Chord[] {
     if (chord.symbol.toLowerCase().includes(normalized)) return true;
     if (chord.root.toLowerCase().includes(normalized)) return true;
     if (chord.displayName.toLowerCase().includes(normalized)) return true;
+    
+    const flatSymbol = getDisplayChordSymbol(chord.symbol, 'flat').toLowerCase();
+    if (flatSymbol.includes(normalized)) return true;
+    
+    const flatRoot = getDisplayNote(chord.root, 'flat').toLowerCase();
+    if (flatRoot.includes(normalized)) return true;
+    
     return false;
   }).slice(0, 30);
 }

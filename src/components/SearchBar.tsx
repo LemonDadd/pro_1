@@ -53,7 +53,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
   
   const handleChordClick = (symbol: string, positionIndex = 0) => {
-    navigate(`/chord/${encodeURIComponent(symbol)}?position=${positionIndex}`);
+    const displaySymbol = getDisplayChordSymbol(symbol, noteDisplay);
+    navigate(`/chord/${encodeURIComponent(displaySymbol)}?position=${positionIndex}`);
     setIsOpen(false);
     setQuery('');
   };

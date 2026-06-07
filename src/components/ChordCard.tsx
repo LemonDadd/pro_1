@@ -43,7 +43,7 @@ const ChordCard: React.FC<ChordCardProps> = ({
   
   return (
     <Link
-      to={`/chord/${encodeURIComponent(chord.symbol)}`}
+      to={`/chord/${encodeURIComponent(displaySymbol)}`}
       className={`
         group block bg-cream-50 dark:bg-wood-800 rounded-2xl shadow-soft hover:shadow-warm
         transition-all duration-300 hover:-translate-y-1 overflow-hidden
